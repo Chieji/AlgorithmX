@@ -1,0 +1,5 @@
+{
+  "name": "AlgorithmX",
+  "description": "AlgorithmX is an AI-powered agent to manage Facebook page posts using natural language commands. You can create, edit, delete, and list posts through a conversational chat interface.",
+  "requestFramePermissions": []
+}
