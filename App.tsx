@@ -3,15 +3,17 @@ import { ChatInterface } from './components/ChatInterface';
 import { PostList } from './components/PostList';
 import { useFacebookManager } from './hooks/useFacebookManager';
 import { interpretCommand } from './services/geminiService';
-import type { Message, Post, InterpretedCommand, AppSettings } from './types';
+import type { Message, Post, InterpretedCommand, AppSettings, GoogleUser } from './types';
 import { PostModal } from './components/PostModal';
 import { SettingsModal } from './components/SettingsModal';
+import { useAuth } from './AuthContext';
+import { Login } from './components/Login';
+import { Icon } from './components/icons';
 
 const App: React.FC = () => {
+  const { user, loading } = useAuth();
   const { posts, addPost, editPost, deletePost, getLatestPostId } = useFacebookManager();
-  const [messages, setMessages] = useState<Message[]>([
-    { id: Date.now(), text: 'Hello! Please connect your Facebook account in the settings to get started.', sender: 'ai' }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [modalState, setModalState] = useState<{
@@ -32,9 +34,19 @@ const App: React.FC = () => {
 
   const isFacebookConnected = appSettings.facebook?.connected === true;
 
+  // Effect to welcome user upon login
   useEffect(() => {
-    if (isFacebookConnected && messages.length === 1 && messages[0].text.includes('connect your Facebook account')) {
-        setMessages([{ id: Date.now(), text: 'Great, you are connected! How can I help you manage your Facebook page today?', sender: 'ai' }]);
+    if (user) {
+        setMessages([
+          { id: Date.now(), text: `Hello ${user.name}! Please connect your Facebook account in the settings to get started.`, sender: 'ai' }
+        ]);
+    }
+  }, [user]);
+
+
+  useEffect(() => {
+    if (isFacebookConnected && messages.length > 0 && messages[messages.length-1].text.includes('connect your Facebook account')) {
+        setMessages(prev => [...prev, { id: Date.now(), text: 'Great, you are connected! How can I help you manage your Facebook page today?', sender: 'ai' }]);
     }
   }, [isFacebookConnected, messages]);
 
@@ -55,9 +67,9 @@ const App: React.FC = () => {
   };
 
   const handleCommand = async (commandText: string, attachedFile: string | null) => {
-    if (!isFacebookConnected) return;
+    if (!isFacebookConnected || !user) return;
     setIsLoading(true);
-    const userMessage: Message = { id: Date.now(), text: commandText, sender: 'user', attachment: attachedFile };
+    const userMessage: Message = { id: Date.now(), text: commandText, sender: 'user', attachment: attachedFile, user };
     setMessages(prev => [...prev, userMessage]);
 
     try {
@@ -119,7 +131,6 @@ const App: React.FC = () => {
         const postToEdit = posts.find(p => p.id === postIdToEdit);
         if (postToEdit) {
             if (slots.new_caption) {
-                // If AI provides a new caption, open modal with it pre-filled
                 openEditModal({ ...postToEdit, caption: slots.new_caption });
             } else {
                 openEditModal(postToEdit);
@@ -142,20 +153,31 @@ const App: React.FC = () => {
         break;
 
       case 'list_posts':
-        // The posts are always visible, but we can add a confirmation message.
         break;
         
       default:
-        // 'unknown' intent is handled by the default responseText from Gemini
         break;
     }
   };
   
+  if (loading) {
+    return (
+        <div className="flex h-screen w-full items-center justify-center bg-slate-100">
+            <Icon name="algorithmx" className="w-12 h-12 text-indigo-600 animate-pulse" />
+        </div>
+    );
+  }
+
+  if (!user) {
+    return <Login />;
+  }
+
   return (
     <div className="flex h-screen font-sans antialiased text-slate-800">
       <main className="flex-1 flex flex-col md:flex-row h-full overflow-hidden">
         <div className="w-full md:w-1/3 xl:w-1/4 h-1/2 md:h-full flex flex-col bg-white border-r border-slate-200">
           <ChatInterface 
+            user={user}
             messages={messages} 
             onSendCommand={handleCommand} 
             isLoading={isLoading} 

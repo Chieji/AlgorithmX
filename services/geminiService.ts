@@ -1,7 +1,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { InterpretedCommand } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+// FIX: Per @google/genai guidelines, the API key must come from process.env.API_KEY.
+// This also resolves the TypeScript error on import.meta.env.
+const apiKey = process.env.API_KEY;
+if (!apiKey) {
+  throw new Error("API_KEY is not set in environment variables. Please check your .env file.");
+}
+const ai = new GoogleGenAI({ apiKey });
 
 const schema = {
   type: Type.OBJECT,
@@ -66,7 +72,6 @@ export const interpretCommand = async (command: string): Promise<InterpretedComm
     const jsonString = response.text.trim();
     const parsedJson = JSON.parse(jsonString);
 
-    // Basic validation to ensure the parsed object matches the expected structure
     if (parsedJson.intent && parsedJson.slots && parsedJson.responseText) {
       return parsedJson as InterpretedCommand;
     } else {
@@ -75,7 +80,6 @@ export const interpretCommand = async (command: string): Promise<InterpretedComm
 
   } catch (error) {
     console.error("Error calling Gemini API:", error);
-    // Fallback response
     return {
       intent: 'unknown',
       slots: {},

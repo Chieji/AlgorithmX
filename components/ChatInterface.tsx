@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { Message } from '../types';
+import type { Message, GoogleUser } from '../types';
 import { Icon } from './icons';
+import { useAuth } from '../AuthContext';
 
 interface ChatInterfaceProps {
+  user: GoogleUser;
   messages: Message[];
   onSendCommand: (command: string, file: string | null) => void;
   isLoading: boolean;
@@ -19,12 +21,13 @@ const fileToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendCommand, isLoading, onOpenSettings, isFacebookConnected }) => {
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({ user, messages, onSendCommand, isLoading, onOpenSettings, isFacebookConnected }) => {
   const [input, setInput] = useState('');
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { signOutUser } = useAuth();
 
   const handleSend = async () => {
     if ((input.trim() || attachedFile) && isFacebookConnected) {
@@ -65,19 +68,33 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendCo
     <div className="flex flex-col h-full bg-white">
       <header className="flex items-center justify-between p-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
-            <Icon name="algorithmx" className="w-7 h-7 text-indigo-600" />
+            <Icon name="algorithmx" className="w-8 h-8 text-indigo-600" />
             <div>
                 <h1 className="text-xl font-bold text-slate-800">AlgorithmX</h1>
                 <p className="text-sm text-slate-500">Your personal content manager</p>
             </div>
         </div>
-        <button 
-            onClick={onOpenSettings} 
-            className="p-2 text-slate-500 hover:bg-slate-100 rounded-full hover:text-indigo-600 transition-colors"
-            aria-label="Open settings"
-        >
-            <Icon name="settings" className="w-6 h-6" />
-        </button>
+        <div className="flex items-center gap-2">
+            <button 
+                onClick={onOpenSettings} 
+                className="p-2 text-slate-500 hover:bg-slate-100 rounded-full hover:text-indigo-600 transition-colors"
+                aria-label="Open settings"
+            >
+                <Icon name="settings" className="w-6 h-6" />
+            </button>
+            <div className="relative group">
+                <img src={user.picture || undefined} alt="User" className="w-9 h-9 rounded-full cursor-pointer"/>
+                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20 border border-slate-200 hidden group-hover:block">
+                     <div className="px-4 py-3 border-b">
+                        <p className="text-sm font-semibold text-slate-800 truncate">{user.name}</p>
+                        <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                     </div>
+                     <button onClick={signOutUser} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                        Sign Out
+                     </button>
+                </div>
+            </div>
+        </div>
       </header>
       <div className="flex-1 p-4 overflow-y-auto bg-slate-50/50">
         <div className="space-y-4">
@@ -91,10 +108,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendCo
                 <div className={`max-w-xs md:max-w-md px-4 py-2.5 rounded-2xl ${msg.sender === 'user' ? 'bg-indigo-500 text-white rounded-br-lg' : 'bg-slate-200 text-slate-700 rounded-bl-lg'}`}>
                   <p className="text-sm">{msg.text}</p>
                 </div>
-                {msg.sender === 'user' && (
-                  <div className="w-8 h-8 rounded-full bg-slate-600 text-white flex items-center justify-center flex-shrink-0">
-                    <Icon name="user" className="w-5 h-5" />
-                  </div>
+                {msg.sender === 'user' && msg.user && (
+                    <img src={msg.user.picture || undefined} alt="User avatar" className="w-8 h-8 rounded-full flex-shrink-0" />
                 )}
               </div>
             ))}

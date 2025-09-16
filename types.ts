@@ -8,11 +8,19 @@ export interface Post {
   scheduledTime?: string; // Should be an ISO 8601 date string
 }
 
+export interface GoogleUser {
+  sub: string; // The user's unique ID
+  name: string;
+  email: string;
+  picture: string; // URL of the user's profile picture
+}
+
 export interface Message {
   id: number;
   text: string;
   sender: 'user' | 'ai';
   attachment?: string | null;
+  user?: GoogleUser;
 }
 
 export interface Slots {

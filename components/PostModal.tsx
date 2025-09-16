@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import type { Post } from '../types';
 import { Icon } from './icons';

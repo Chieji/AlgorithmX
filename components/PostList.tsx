@@ -1,3 +1,4 @@
+
 import React from 'react';
 import type { Post } from '../types';
 import { PostCard } from './PostCard';
@@ -22,21 +23,21 @@ export const PostList: React.FC<PostListProps> = ({ posts, onOpenEditModal, onDe
     .filter(p => !p.scheduledTime || new Date(p.scheduledTime) <= now)
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
+  const scheduledCount = scheduledPosts.length;
+  const publishedCount = publishedPosts.length;
+  const hasScheduledPosts = scheduledCount > 0;
+  const hasPublishedPosts = publishedCount > 0;
+
   const getSubtitle = () => {
-    const scheduledCount = scheduledPosts.length;
-    const publishedCount = publishedPosts.length;
-    
-    if (scheduledCount === 0 && publishedCount === 0) {
-      if (!isFacebookConnected) return "Connect your account to get started.";
-      return "A live view of your page content.";
-    }
+    if (!isFacebookConnected) return "Connect your account to get started.";
+    if (!hasScheduledPosts && !hasPublishedPosts) return "A live view of your page content.";
 
     const parts = [];
-    if (publishedCount > 0) {
-        parts.push(`${publishedCount} Published`);
+    if (hasScheduledPosts) {
+      parts.push(`${scheduledCount} Scheduled`);
     }
-    if (scheduledCount > 0) {
-        parts.push(`${scheduledCount} Scheduled`);
+    if (hasPublishedPosts) {
+      parts.push(`${publishedCount} Published`);
     }
     return parts.join(' • ');
   };
@@ -62,28 +63,28 @@ export const PostList: React.FC<PostListProps> = ({ posts, onOpenEditModal, onDe
                 Go to Settings
             </button>
           </div>
-        ) : posts.length > 0 ? (
+        ) : (posts.length > 0) ? (
           <div className="max-w-2xl mx-auto space-y-8">
-            {scheduledPosts.length > 0 && (
-              <div>
+            {hasScheduledPosts && (
+              <section>
                 <h3 className="mb-4 text-sm font-semibold text-slate-500 uppercase tracking-wider">Scheduled</h3>
                 <div className="space-y-6">
                   {scheduledPosts.map(post => (
                     <PostCard key={post.id} post={post} onOpenEditModal={onOpenEditModal} onDelete={onDelete} />
                   ))}
                 </div>
-              </div>
+              </section>
             )}
             
-            {publishedPosts.length > 0 && (
-              <div>
+            {hasPublishedPosts && (
+              <section>
                  <h3 className="mb-4 text-sm font-semibold text-slate-500 uppercase tracking-wider">Published</h3>
                  <div className="space-y-6">
                     {publishedPosts.map(post => (
                         <PostCard key={post.id} post={post} onOpenEditModal={onOpenEditModal} onDelete={onDelete} />
                     ))}
                  </div>
-              </div>
+              </section>
             )}
           </div>
         ) : (
