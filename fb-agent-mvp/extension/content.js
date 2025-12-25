@@ -27,6 +27,24 @@ try {
     console.warn('AlgorithmX: ping background failed', e?.message || e);
 }
 
+// Respond to background-initiated pings so worker can verify content script availability
+try {
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+            if (message && message.type === 'PING_CONTENT') {
+                try {
+                    sendResponse({ ok: true, ts: Date.now() });
+                } catch (err) {
+                    console.warn('AlgorithmX: error responding to PING_CONTENT', err?.message || err);
+                }
+                return true;
+            }
+        });
+    }
+} catch (e) {
+    console.warn('AlgorithmX: register PING_CONTENT listener failed', e?.message || e);
+}
+
 // Custom error types
 class ConnectionError extends Error {
     constructor(msg) { super(msg); this.name = 'ConnectionError'; }
