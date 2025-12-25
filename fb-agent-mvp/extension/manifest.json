@@ -3,7 +3,7 @@
   "name": "AlgorithmX",
   "version": "0.0.1",
   "description": "AlgorithmX v0.0.1 - AI-powered Facebook page automation agent",
-  "permissions": ["activeTab", "scripting", "storage", "alarms"],
+  "permissions": ["activeTab", "scripting", "storage", "alarms", "clipboardWrite"],
   "host_permissions": ["*://*.facebook.com/*", "http://localhost:3000/*", "http://127.0.0.1:3000/*"],
   "content_scripts": [
     {
