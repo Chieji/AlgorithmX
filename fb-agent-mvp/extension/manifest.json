@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "AlgorithmX",
+  "version": "0.0.1",
+  "description": "AlgorithmX v0.0.1 - AI-powered Facebook page automation agent",
+  "permissions": ["activeTab", "scripting", "storage", "alarms"],
+  "host_permissions": ["*://*.facebook.com/*", "http://localhost:3000/*", "http://127.0.0.1:3000/*"],
+  "content_scripts": [
+    {
+      "matches": ["*://*.facebook.com/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "action": {
+    "default_popup": "settings.html",
+    "default_title": "FB Agent Settings"
+  }
+  
+  ,"background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
