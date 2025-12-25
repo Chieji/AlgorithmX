@@ -1,0 +1,249 @@
+/* Project ID: FB-AGENT-MVP-20251225 - Modern Chat UI */
+
+#fb-agent-root {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 99999;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+}
+
+.fb-agent-container {
+    width: 400px;
+    max-height: 600px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fb-agent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: linear-gradient(135deg, #0084FF 0%, #0066CC 100%);
+    color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.header-icon {
+    font-size: 20px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.header-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.fb-agent-chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.fb-agent-chat::-webkit-scrollbar {
+    width: 6px;
+}
+
+.fb-agent-chat::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.fb-agent-chat::-webkit-scrollbar-thumb {
+    background: #d0d0d0;
+    border-radius: 3px;
+}
+
+.fb-agent-chat::-webkit-scrollbar-thumb:hover {
+    background: #b0b0b0;
+}
+
+.message {
+    display: flex;
+    padding: 10px 12px;
+    border-radius: 12px;
+    max-width: 85%;
+    word-wrap: break-word;
+    font-size: 13px;
+    line-height: 1.4;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-user {
+    align-self: flex-end;
+    background: #0084FF;
+    color: white;
+    border-radius: 18px 4px 18px 18px;
+}
+
+.message-bot {
+    align-self: flex-start;
+    background: #e5e5ea;
+    color: #000;
+    border-radius: 4px 18px 18px 18px;
+}
+
+.fb-agent-input-area {
+    border-top: 1px solid #e5e5ea;
+    padding: 12px;
+    background: white;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+#fbAgentInput {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 20px;
+    resize: none;
+    font-family: inherit;
+    font-size: 13px;
+    max-height: 100px;
+    transition: all 0.2s ease;
+}
+
+#fbAgentInput:focus {
+    outline: none;
+    border-color: #0084FF;
+    box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.1);
+}
+
+#fbAgentInput::placeholder {
+    color: #999;
+}
+
+.btn-submit {
+    width: 36px;
+    height: 36px;
+    background: #0084FF;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.btn-submit:hover {
+    background: #0066CC;
+    transform: scale(1.05);
+}
+
+.btn-submit:active {
+    transform: scale(0.95);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #999;
+    margin-top: 8px;
+    padding: 0 4px;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #0084FF;
+    display: inline-block;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0.3; }
+}
+
+#statusText {
+    font-weight: 500;
+}
+
+/* Accessibility */
+@media (max-height: 600px) {
+    .fb-agent-container {
+        max-height: 400px;
+    }
+}
+
+@media (max-width: 480px) {
+    .fb-agent-container {
+        width: 100vw;
+        max-height: 100vh;
+        max-width: 100%;
+        right: 0;
+        bottom: 0;
+        border-radius: 0;
+    }
+}
